@@ -1,0 +1,24 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+*.secret
+*.secrets
+*.credential
+*.credentials
+*.pem
+*.pfx
+.agents/
+.codex/
+
+# Local architecture visualization draft. Keep the public repo focused on Markdown docs.
+docs/architecture-overview.html
+
+# Saved Terraform plan files — can embed variable values and secrets. Never commit.
+*.tfplan
+tfplan
+ca_enabled
+provider-schema.json
