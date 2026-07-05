@@ -1,5 +1,7 @@
 # Azure Entra Zero Trust Landing Zone
 
+[![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A5%201.6-7B42BC?logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform) ![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-0078D4?logo=microsoftazure&logoColor=white) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) ![Status: Phase 1 Complete](https://img.shields.io/badge/Phase%201-Complete-brightgreen)
+
 A portfolio-grade, **Terraform-driven** reference implementation of Zero Trust across Microsoft Entra ID, Intune, and Defender. It demonstrates the ability to **design, codify, and document** enterprise identity and device security controls — not just configure them by hand.
 
 > **Status: building in public, in phases.** The full architecture is designed up front (below); modules are implemented and published incrementally. Each shipped module includes the Terraform, an Architectural Decision Record (ADR), and a "why this matters" rationale. Phase 1 (identity baseline + Conditional Access) is deployed and evidenced; CA004 is republished in report-only pending observation.
