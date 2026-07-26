@@ -17,6 +17,12 @@ resource "azuread_user" "break_glass" {
   password              = random_password.break_glass[each.key].result # reference -> implicit dependency
   force_password_change = false                                        # emergency accounts must just work
   account_enabled       = true
+
+  # Entra requires usageLocation before any licence can be assigned to a user.
+  # Emergency accounts need Entra ID P2 for risk-based Conditional Access and
+  # PIM evaluation, so this is a licensing prerequisite, not cosmetic metadata.
+  # Managed here so a later apply cannot silently strip it and de-licence them.
+  usage_location = "au"
   lifecycle {
     prevent_destroy = true
     ignore_changes  = [password]
@@ -45,4 +51,11 @@ resource "azuread_directory_role_assignment" "break_glass_global_administrator" 
   # Built-in directory role assignments use the role template ID.
   role_id             = azuread_directory_role.global_administrator.template_id
   principal_object_id = each.value.object_id
+
+  # An emergency account that can sign in but holds no privilege is only half a
+  # fallback (see ADR-002). Guard the assignment, not just the account: destroying
+  # it silently downgrades both break-glass accounts to unprivileged users.
+  lifecycle {
+    prevent_destroy = true
+  }
 }
