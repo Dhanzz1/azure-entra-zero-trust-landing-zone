@@ -53,33 +53,33 @@ resource "azuread_conditional_access_policy" "this" {
       sign_in_frequency_period = "hours"
     }
   }
-  
-lifecycle {
-  precondition {
-    condition = (
-      length(var.included_users) > 0 ||
-      length(var.included_group_object_ids) > 0 ||
-      length(var.included_roles) > 0
-    )
-    error_message = "A Conditional Access policy must target at least one user, group, or role."
+
+  lifecycle {
+    precondition {
+      condition = (
+        length(var.included_users) > 0 ||
+        length(var.included_group_object_ids) > 0 ||
+        length(var.included_roles) > 0
+      )
+      error_message = "A Conditional Access policy must target at least one user, group, or role."
+    }
+    precondition {
+      condition = (
+        length(var.built_in_controls) > 0 ||
+        var.authentication_strength_policy_id != null
+      )
+      error_message = "Configure a built-in grant control or an authentication strength."
+    }
+    precondition {
+      condition = !(
+        var.state == "enabled" &&
+        contains(var.built_in_controls, "block") &&
+        contains(var.included_users, "All") &&
+        length(var.excluded_users) == 0 &&
+        length(var.excluded_group_object_ids) == 0
+      )
+      error_message = "An enabled block-All-users policy requires at least one reviewed exclusion."
+    }
   }
-  precondition {
-    condition = (
-      length(var.built_in_controls) > 0 ||
-      var.authentication_strength_policy_id != null
-    )
-    error_message = "Configure a built-in grant control or an authentication strength."
-  }
-  precondition {
-    condition = !(
-      var.state == "enabled" &&
-      contains(var.built_in_controls, "block") &&
-      contains(var.included_users, "All") &&
-      length(var.excluded_users) == 0 &&
-      length(var.excluded_group_object_ids) == 0
-    )
-    error_message = "An enabled block-All-users policy requires at least one reviewed exclusion."
-  }
-}
 }
 
