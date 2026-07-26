@@ -4,11 +4,11 @@
 
 ## Purpose
 
-Apply least-privilege to administration: standing privilege only for monitored emergency accounts, and just-in-time elevation for everyone else.
+Apply least-privilege to administration: standing privilege only for passkey-protected emergency accounts, and just-in-time elevation for everyone else. Sentinel monitoring is planned, not yet deployed.
 
 ## Implemented (Phase 1)
 
-- Two cloud-only **break-glass** accounts with **permanent Global Administrator** (deliberately not PIM-eligible), excluded from all Conditional Access via the `CA-BreakGlass-Exclude` group. Implemented in `terraform/break-glass.tf`. See [ADR-002](../docs/adr/adr-002-break-glass-exclusion.md).
+- Two cloud-only **break-glass** accounts with **permanent Global Administrator** (deliberately not PIM-eligible), excluded from repository-managed Conditional Access via the `CA-BreakGlass-Exclude` group. Both use portal-managed, separately tested synced passkeys to satisfy Microsoft's mandatory portal MFA. The account/group baseline is implemented in `terraform/break-glass.tf`; the passkeys are portal-managed. See [ADR-002](../docs/adr/adr-002-break-glass-exclusion.md).
 
 ## Planned (Phase 3)
 
@@ -22,4 +22,4 @@ Threat: standing privileged accounts are the highest-value target; over-provisio
 
 Trade-off: JIT elevation adds a small activation step for admins in exchange for a much smaller standing-privilege footprint.
 
-Exception handling: break-glass accounts are the deliberate exception — permanent GA, excluded from controls, and monitored precisely because of it.
+Exception handling: break-glass accounts are the deliberate exception — permanent GA, excluded from repository-managed Conditional Access, protected by tested passkeys, and scheduled for Sentinel monitoring.

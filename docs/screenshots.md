@@ -51,5 +51,8 @@ Terraform deployment was verified against the live lab tenant; generated state, 
 ![Break-glass What If result](screenshots/break-glass-what-if-result.png)
 *What If result for a break-glass account showing no Conditional Access policies apply to the emergency-access path.*
 
+![Emergency-account passkey sign-in](screenshots/v1-01-emergency-passkey-signin.png)
+*Captured 2026-07-20 — representative sanitised evaluation and operational evidence for the two separately tested emergency accounts. It shows a successful synced-passkey sign-in; tenant/user context, credential metadata, IP, device, and session identifiers are excluded. It does not prove physical-key independence, Sentinel monitoring, or that a Conditional Access policy applied.*
+
 ## Redaction notes
 These are from a personal lab tenant, so the `dhanzlabs.com` domain and test/break-glass accounts are intentionally shown. Always crop/blur tenant ID, subscription ID, and real user PII before publishing.

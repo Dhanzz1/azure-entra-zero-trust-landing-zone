@@ -15,11 +15,11 @@ Primary misuse, compromise, and bypass scenarios modelled here: MFA bypass via l
 | 4 | High-risk user | Identity Protection flags a likely compromised user | High user-risk remediation (MFA + secure password change) | 02 | Report-only until observed; requires P2 and MFA registration |
 | 5 | Non-compliant / infected device | Unmanaged endpoint | Require compliant device + Defender risk gating | 03, 06 | Planned (Phase 2) |
 | 6 | Privileged account abuse | Standing admin rights | PIM just-in-time + MFA + justification | 09 | Planned (Phase 3) |
-| 7 | Admin lockout | Misconfigured CA policy | Break-glass excluded from all CA | 09 | Standing GA bypassing MFA — mitigated by monitoring (#9) |
+| 7 | Admin lockout | Misconfigured CA policy | Break-glass excluded from repository CA; passkey satisfies mandatory portal MFA | 09 | Standing GA; synced-passkey custody dependency; Sentinel monitoring pending (#9) |
 | 8 | External oversharing | Over-permissive guest access | Collaboration membership, SharePoint sharing controls, and access reviews | 09 | Planned (Phase 3 governance); see ADR-004 |
 | 9 | Break-glass misuse | Emergency account abused | Sentinel alert on break-glass sign-in | 07 | Planned (Phase 3) |
 
 ## Residual Risk
 - Threats 5, 6, 8, and 9 are designed but not yet implemented — tracked in the README module status table.
-- Standing Global Admin on break-glass accounts is an accepted, monitored risk (see ADR-002).
+- Standing Global Administrator on break-glass accounts is an accepted lab risk. Passkeys are tested; Sentinel monitoring remains planned (see ADR-002).
 - This is a portfolio threat model for a lab tenant, not an exhaustive enterprise assessment.

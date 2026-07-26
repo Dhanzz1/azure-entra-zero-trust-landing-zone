@@ -8,7 +8,7 @@ All ADR trade-offs are written against this context; larger enterprises may choo
 ## Design principles
 This landing zone applies the three Zero Trust tenets:
 - **Verify explicitly** — every access decision uses identity, device, and risk signals (Conditional Access + Identity Protection + device compliance).
-- **Least privilege** — just-enough, just-in-time admin via PIM; standing privilege only for monitored break-glass.
+- **Least privilege** — just-enough, just-in-time admin via PIM; standing privilege only for passkey-protected emergency accounts, with Sentinel monitoring planned.
 - **Assume breach** — legacy auth blocked, risky sign-ins blocked, detections in Sentinel, blast radius limited by segmenting admin roles.
 
 ## Identity-First Control Map
@@ -38,7 +38,7 @@ Intended sequencing and dependencies:
 4. **09 administrative-governance** (PIM) and **07 sentinel** wrap the whole thing in least-privilege admin and monitoring (including a break-glass sign-in alert).
 
 ## Administrative & break-glass model
-Two cloud-only break-glass accounts hold **permanent** Global Administrator (deliberately *not* PIM-eligible, so role activation can never be blocked in an emergency), are excluded from all Conditional Access, and are monitored (planned Sentinel alert, module 07). Day-to-day admin moves to **PIM** (eligible, just-in-time, MFA + justification) in Phase 3.
+Two cloud-only break-glass accounts hold **permanent** Global Administrator (deliberately *not* PIM-eligible, so role activation can never be blocked in an emergency). They are excluded from this repository's Conditional Access policies, but still satisfy Microsoft's mandatory portal MFA with separately tested synced passkeys. Sentinel sign-in monitoring is planned in module 07. Day-to-day admin moves to **PIM** (eligible, just-in-time, MFA + justification) in Phase 3.
 
 ## Hybrid Identity Notes
 This lab is cloud-only, but a production landing zone must choose an authentication method:
