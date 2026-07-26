@@ -1,7 +1,7 @@
 terraform {
-  # Don't run this config with a Terraform older than 1.6 — guards against
+  # Don't run this config with a Terraform older than 1.7 — guards against
   # someone using an incompatible CLI and getting confusing errors.
-  required_version = ">= 1.6"
+  required_version = ">= 1.7"
 
   required_providers {
     azuread = {

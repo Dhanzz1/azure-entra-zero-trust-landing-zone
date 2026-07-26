@@ -17,6 +17,10 @@ resource "azuread_user" "break_glass" {
   password              = random_password.break_glass[each.key].result # reference -> implicit dependency
   force_password_change = false                                        # emergency accounts must just work
   account_enabled       = true
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [password]
+  }
 }
 
 # 3. The exclusion group. The for-expression builds a list of member IDs,
@@ -26,6 +30,9 @@ resource "azuread_group" "break_glass_exclude" {
   security_enabled = true
   mail_enabled     = false
   members          = [for u in azuread_user.break_glass : u.object_id]
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "azuread_directory_role" "global_administrator" {

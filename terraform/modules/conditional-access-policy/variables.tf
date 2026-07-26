@@ -21,6 +21,12 @@ variable "included_roles" {
   default     = []
 }
 
+variable "included_group_object_ids" {
+  description = "Group object IDs included in the policy."
+  type        = list(string)
+  default     = []
+}
+
 variable "excluded_users" {
   description = "Users excluded from the policy, e.g. [\"GuestsOrExternalUsers\"]."
   type        = list(string)
@@ -40,8 +46,9 @@ variable "client_app_types" {
 }
 
 variable "built_in_controls" {
-  description = "Grant controls to enforce, e.g. [\"block\"] or [\"mfa\"]."
+  description = "Built-in grant controls. Empty is valid when an authentication strength is supplied."
   type        = list(string)
+  default     = []
 }
 
 variable "grant_operator" {
