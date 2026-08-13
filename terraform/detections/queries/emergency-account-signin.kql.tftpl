@@ -1,0 +1,6 @@
+let EmergencyAccountIds = dynamic(${emergency_account_ids});
+SigninLogs
+| where UserId in (EmergencyAccountIds)
+| project TimeGenerated, UserPrincipalName, UserId, IPAddress,
+          AppDisplayName, ConditionalAccessStatus,
+          AuthenticationRequirement, ResultType, ResultDescription
