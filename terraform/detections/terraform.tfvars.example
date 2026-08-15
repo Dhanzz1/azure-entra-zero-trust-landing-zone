@@ -3,3 +3,5 @@
 
 subscription_id = "00000000-0000-0000-0000-000000000000"
 location        = "australiaeast"
+emergency_account_object_ids = ["00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000"]
+protected_group_object_ids   = ["00000000-0000-0000-0000-000000000000"]
