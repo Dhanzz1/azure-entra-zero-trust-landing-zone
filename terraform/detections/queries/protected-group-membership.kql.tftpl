@@ -1,0 +1,8 @@
+let ProtectedGroupIds = dynamic(${protected_group_ids});
+AuditLogs
+| where OperationName in~ ("Add member to group", "Remove member from group")
+| where tostring(TargetResources) has_any (ProtectedGroupIds)
+| extend InitiatedByUPN = tostring(InitiatedBy.user.userPrincipalName),
+         InitiatedByApp = tostring(InitiatedBy.app.displayName)
+| project TimeGenerated, OperationName, InitiatedByUPN, InitiatedByApp,
+          TargetResources, Result, CorrelationId
