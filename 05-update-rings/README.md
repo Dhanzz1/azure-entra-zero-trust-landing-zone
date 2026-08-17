@@ -1,12 +1,21 @@
 # 05 Update Rings
 
-**Status:** 🗓 Planned (Phase 2) — Zero Trust pillar: Devices
+**Status:** Out of scope for v1.0 — Zero Trust pillar: Devices
+
+> **This module is not implemented and is not scheduled.** Intune configuration is exposed through
+> Microsoft Graph, while AzAPI targets Azure Resource Manager — so the provider approach originally
+> planned here was structurally impossible, not merely difficult. Three alternatives were evaluated
+> (`microsoft/msgraph` public preview, `deploymenttheory/microsoft365`, `terraprovider/microsoft365wp`)
+> and none was adopted for this release.
+>
+> The design notes below are retained deliberately, as the record of what was intended and why it was
+> not built. This is a scope decision, not a backlog item.
 
 ## Purpose
 
 Encode a staged operating-system update rollout so patches reach devices predictably — reducing the unpatched-vulnerability window without risking a broad simultaneous rollout.
 
-## What this will codify
+## What this would have codified
 
 - At least two Intune Update Rings (pilot and broad) with different deferral periods and deadlines.
 - Assignment of rings to device groups.
