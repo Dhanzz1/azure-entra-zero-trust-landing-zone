@@ -41,6 +41,33 @@ resource "azuread_group" "break_glass_exclude" {
   }
 }
 
+data "azuread_client_config" "current" {}
+
+resource "azuread_group" "break_glass_exclude_role_assignable" {
+  display_name            = "CA-BreakGlass-Exclude-RoleAssignable"
+  security_enabled        = true
+  mail_enabled            = false
+  assignable_to_role      = true
+  prevent_duplicate_names = true
+  members                 = [for user in azuread_user.break_glass : user.object_id]
+
+  # Lab trade-off: the deploying administrator is an owner. Production should
+  # use a deliberately governed owner/PIM model and avoid broad group ownership.
+  owners = [data.azuread_client_config.current.object_id]
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+}
+
+locals {
+  emergency_exclusion_group_ids = [
+    azuread_group.break_glass_exclude.object_id,
+    azuread_group.break_glass_exclude_role_assignable.object_id,
+  ]
+}
+
 resource "azuread_directory_role" "global_administrator" {
   display_name = "Global Administrator"
 }
