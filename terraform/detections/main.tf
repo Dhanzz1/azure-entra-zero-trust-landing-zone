@@ -27,4 +27,8 @@ resource "azurerm_monitor_aad_diagnostic_setting" "entra" {
   enabled_log {
     category = "SignInLogs"
   }
+
+  enabled_log {
+    category = "NonInteractiveUserSignInLogs"
+  }
 }
