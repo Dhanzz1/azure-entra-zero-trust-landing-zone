@@ -36,7 +36,7 @@ Configured manually because the `azuread` provider does not currently provide cl
 - Group naming policy: Entra admin center -> Groups -> Naming policy.
 - Group-based licensing for assigning the EMS E5 / Entra ID P2 licence to `All-Members-Dynamic`: Entra admin center -> Groups -> All-Members-Dynamic -> Licenses.
 - Security Defaults: disabled manually (Entra -> Properties -> Manage security defaults) to allow custom Conditional Access; there is no clean provider resource for this toggle.
-- Location-based admin restrictions are intentionally deferred until the Phase 3 admin-location Conditional Access policy that consumes them is implemented.
-- Guest authorization is handled through collaboration membership, SharePoint sharing settings, and Phase 3 governance rather than a Phase 1 guest-specific Conditional Access policy.
+- Location-based admin restrictions are out of scope for v1.0; no admin-location Conditional Access policy consumes them.
+- Guest authorization is handled through collaboration membership and SharePoint sharing settings rather than a guest-specific Conditional Access policy; broader guest governance is out of scope for v1.0.
 
 These manual items are candidates to move into code later through Microsoft Graph or AzAPI once provider support matures. Until then, automation should be described as supporting the baseline with human validation rather than fully replacing portal configuration.

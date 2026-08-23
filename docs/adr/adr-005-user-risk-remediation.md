@@ -26,7 +26,7 @@ Deploy `ZT-High-User-Risk-Remediation` as a report-only Conditional Access polic
 - state: `enabledForReportingButNotEnforced`
 - exclusions: break-glass group and guest/external users
 
-Admins are deliberately in scope for this reference context. At the target size of roughly 100-500 users, self-remediation applies to everyone, and the Phase 3 phishing-resistant admin policy stacks on top without changing this policy. At enterprise scale, admin user risk would usually route to a security-team investigation and recovery path instead of automatic self-remediation.
+Admins are deliberately in scope for this reference context. At the target size of roughly 100-500 users, self-remediation applies to everyone, and a phishing-resistant admin policy, were one added, would stack on top without changing this policy. At enterprise scale, admin user risk would usually route to a security-team investigation and recovery path instead of automatic self-remediation.
 
 Guests are excluded because they cannot change their home-tenant password in this tenant. The pattern is: guests receive authentication and risk controls they can satisfy, and are excluded from password or device controls they cannot satisfy.
 

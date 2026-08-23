@@ -11,7 +11,7 @@ A reusable Terraform sub-module that standardises how every Conditional Access p
 - **Grant controls**: block, MFA, secure password change, or authentication strength, with `OR`/`AND` operator support.
 - **State**: report-only vs enabled, so policies can be staged safely before enforcement.
 
-It is consumed by `terraform/conditional-access.tf` to produce the four Phase 1 policies: block legacy auth, require MFA, block high-risk sign-ins, and high user-risk remediation.
+It is consumed by `terraform/conditional-access.tf` to produce the four Conditional Access policies: block legacy auth, require MFA, block high-risk sign-ins, and high user-risk remediation.
 
 ## Inputs / Outputs
 
