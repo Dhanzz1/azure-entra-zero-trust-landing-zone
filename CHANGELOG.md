@@ -28,14 +28,17 @@ Work completed since v0.1.0. This section becomes `[1.0.0]` at tag.
 - Module 08 restated as linked work, not deferred scope.
 - Terraform prerequisite corrected to `>= 1.7` to match `versions.tf`.
 - Entra diagnostic export extended to include non-interactive user sign-ins.
+  `NonInteractiveUserSignInLogs` was enabled on 22 August 2026; no rows were observed in the
+  queried 14-day window as of 23 August.
 
 ### Deferred
 - **CA004 remains Report-only evaluated.** Promotion to enforced is cut from this release, not
   pending observation.
 - **Legacy exclusion-group retirement.** The legacy group stays in the active exclusion path; both
   groups are excluded and monitored. Retirement is deliberately deferred.
-- **Non-interactive sign-in detection.** The category is now collected; the emergency-account rule
-  evaluates interactive sign-ins only. Production delta: `union` both tables in the rule query.
+- **Non-interactive sign-in detection.** `NonInteractiveUserSignInLogs` was enabled on 22 August
+  2026; no rows were observed in the queried 14-day window as of 23 August. The emergency-account
+  rule evaluates interactive sign-ins only. Production delta: `union` both tables in the rule query.
 
 ## [0.1.0] - 2026-07-05 — Identity baseline + Conditional Access
 
