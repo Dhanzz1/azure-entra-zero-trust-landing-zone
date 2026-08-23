@@ -17,9 +17,9 @@ Provision two cloud-only break-glass accounts that:
 - belong to **two** groups — a legacy exclusion group and a role-assignable parallel group — **both
   excluded from every repository-managed Conditional Access policy**;
 - hold **permanent (active) Global Administrator** — deliberately **not** PIM-eligible, so role activation can never be blocked by the very MFA/approval flow that may be failing;
-- use portal-managed synced passkeys in this lab, which satisfy Microsoft's mandatory MFA requirement, re-tested per account after full session and refresh-token revocation on 2026-08-22;
+- use portal-managed synced passkeys in this lab, which satisfy Microsoft's mandatory MFA requirement and are the only registered authentication method on either account; a passkey assertion for an emergency account is recorded in the [evidence index](../screenshots.md#sentinel-detections-e13);
 - use independently stored physical FIDO2 keys or certificate-based authentication in production; and
-- are monitored by a Sentinel scheduled analytics rule that alerts on any emergency-account sign-in (module 07, deployed 2026-08-13; positive events evidenced 2026-08-15 and 2026-08-16).
+- are monitored by a Sentinel scheduled analytics rule that alerts on any emergency-account sign-in (module 07 — workspace and Entra log export deployed 2026-08-13, analytics rules 2026-08-15). The rule has fired on real emergency-account sign-ins; see the [evidence index](../screenshots.md#sentinel-detections-e13).
 
 Security Defaults is disabled before enforcing Conditional Access; the break-glass exclusion is what makes that switchover safe.
 

@@ -4,7 +4,7 @@ This ADR follows the structure in [ADR 000](./adr-000-template.md).
 
 ## Status
 
-Accepted (risk-based portion); Proposed (device-compliance portion, Phase 2)
+Accepted — risk-based portion only. The device-compliance portion is out of scope for this release.
 
 ## Context
 
@@ -13,11 +13,11 @@ Static policies (MFA, location) don't react to signals that a session is activel
 ## Decision
 
 - **Now (implemented):** a Conditional Access policy that **blocks** sign-ins evaluated as **high** sign-in risk via Entra ID Protection, excluding break-glass. Medium/low risk is left to MFA + monitoring initially to balance security and usability.
-- **Phase 2 (planned):** a "require compliant device" condition, where Intune compliance (including Defender risk score) gates access. Documented here so the design intent is visible before the code ships.
+- **Out of scope for this release:** a "require compliant device" condition, where Intune compliance (including Defender risk score) would gate access. It is recorded here because the design intent shaped the Conditional Access module's variable surface — the condition can be added as a grant control without restructuring the policies. No device signal reaches Conditional Access in this release; see the [scope boundary](../../README.md#scope-boundary).
 
 ## Consequences
 
-- **Positive:** Adaptive control that stops compromised credentials even with valid MFA, and (in Phase 2) ties access to device health — closing gaps static policies leave open.
+- **Positive:** Adaptive control that stops compromised credentials even with valid MFA. Tying access to device health would close a further gap that static policies leave open; that is out of scope here.
 - **Negative:** Requires P2 (and Intune for the device portion); false positives can block legitimate users, so an exception/recovery path and threshold tuning are needed.
 
 ## Alternatives Considered
