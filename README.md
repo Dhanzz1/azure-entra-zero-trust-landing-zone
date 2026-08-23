@@ -12,7 +12,7 @@ The standard this repository holds itself to: controls are defined as code, desi
 
 v1.0 is the **terminal** release of this repository, not a milestone toward a larger roadmap. Its scope is an identity and detection baseline: tenant hardening, four Conditional Access policies rendered from one reusable module, emergency access with a role-assignable exclusion group, Privileged Identity Management exercised in the portal, and three Sentinel analytics rules defined as code. Device management is out of scope by decision, not by deferral.
 
-Reaching v1.0 additionally requires a documentation truth pass across every public document, three remaining decision records (the Intune provider boundary, PIM alongside standing emergency access, and Sentinel detection-as-code), a sanitised evidence index pairing each claim with its artefact, and CI running `fmt -check`, `validate` and `tflint`. Those remain outstanding; where a claim is ahead of its evidence, this README says so.
+Reaching v1.0 additionally required a documentation truth pass across every public document, so that no published claim outruns what this repository can show. Remaining decision records, a full sanitised evidence index pairing every claim with its artefact, and CI coverage of the Sentinel root are outside this release — by decision, not by deferral. Where a claim is ahead of its evidence, this README says so.
 
 ## Why this exists
 
