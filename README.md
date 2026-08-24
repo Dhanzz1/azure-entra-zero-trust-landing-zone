@@ -58,7 +58,7 @@ Modules 03–06 are **out of scope for v1.0**. This is a decision, not a backlog
 | 05 | update-rings | Same provider boundary |
 | 06 | defender-endpoint | Same provider boundary; also depends on 03 |
 
-Three Terraform providers were evaluated as alternatives (`microsoft/msgraph` public preview, `deploymenttheory/microsoft365`, `terraprovider/microsoft365wp`). None was adopted for this release. The directories are retained with their design notes: a documented scope boundary is evidence of a decision, whereas a deleted directory is evidence of nothing. The decision record for this — including the specific conditions that would cause it to be revisited — is in preparation.
+Three Terraform providers were evaluated as alternatives (`microsoft/msgraph` public preview, `deploymenttheory/microsoft365`, `terraprovider/microsoft365wp`). None was adopted for this release. The directories are retained with their design notes: a documented scope boundary is evidence of a decision, whereas a deleted directory is evidence of nothing. The reasoning, the rejected alternatives, and what would change the assessment are recorded in [ADR-006](docs/adr/adr-006-device-management-out-of-scope.md).
 
 ### Conditional Access policy set (module 02)
 
