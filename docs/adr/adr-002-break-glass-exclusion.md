@@ -21,7 +21,7 @@ Provision two cloud-only break-glass accounts that:
 - use independently stored physical FIDO2 keys or certificate-based authentication in production; and
 - are monitored by a Sentinel scheduled analytics rule that alerts on **interactive** emergency-account sign-ins (module 07 — workspace and Entra log export deployed 2026-08-13, analytics rules 2026-08-15). The rule query reads `SigninLogs` only. Non-interactive sign-ins are collected but no rule evaluates them, so this is a monitored path rather than complete coverage of the emergency accounts — see [module 07](../../07-sentinel-kql/README.md#limitations). The rule has fired on real emergency-account sign-ins; see the [evidence index](../screenshots.md#sentinel-detections-e13).
 
-Security Defaults is disabled before enforcing Conditional Access; the break-glass exclusion is what makes that switchover safe.
+Security Defaults is disabled before enforcing Conditional Access. The break-glass exclusion is one precondition for making that switchover recoverable, not the whole of it: the accounts must also hold active Global Administrator and have an authentication method that satisfies Microsoft's mandatory portal MFA, **tested by a real sign-in**, before enforcement begins. An exclusion from a policy the account cannot sign in past is not a recovery path. The staged bootstrap sequence that establishes those preconditions is in the [README](../../README.md#deploy-it-yourself).
 
 ## Consequences
 
