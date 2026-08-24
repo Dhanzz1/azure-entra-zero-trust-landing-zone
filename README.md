@@ -1,6 +1,6 @@
 # Azure Entra Zero Trust Landing Zone
 
-[![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A5%201.7-7B42BC?logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform) ![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-0078D4?logo=microsoftazure&logoColor=white) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) ![Release: v0.1.0](https://img.shields.io/badge/Release-v0.1.0-blue) ![Scope: identity and detection](https://img.shields.io/badge/Scope-identity%20%2B%20detection-informational)
+[![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A5%201.7-7B42BC?logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform) ![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-0078D4?logo=microsoftazure&logoColor=white) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) ![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-blue) ![Scope: identity and detection](https://img.shields.io/badge/Scope-identity%20%2B%20detection-informational)
 
 A **Terraform-driven** Zero Trust identity baseline for Microsoft Entra ID, built and evidenced in a live lab tenant. Conditional Access policies, emergency-account and exclusion-group configuration, and Sentinel detections are defined as code. Passkeys and PIM are portal-managed.
 
@@ -12,7 +12,7 @@ The standard this repository holds itself to: controls are defined as code, desi
 
 v1.0 is the **terminal** release of this repository, not a milestone toward a larger roadmap. Its scope is an identity and detection baseline: tenant hardening, four Conditional Access policies rendered from one reusable module, emergency access with a role-assignable exclusion group, Privileged Identity Management exercised in the portal, and three Sentinel analytics rules defined as code. Device management is out of scope by decision, not by deferral.
 
-Reaching v1.0 additionally requires a documentation truth pass across every public document, three remaining decision records (the Intune provider boundary, PIM alongside standing emergency access, and Sentinel detection-as-code), a sanitised evidence index pairing each claim with its artefact, and CI running `fmt -check`, `validate` and `tflint`. Those remain outstanding; where a claim is ahead of its evidence, this README says so.
+Reaching v1.0 additionally required a documentation truth pass across every public document, so that no published claim outruns what this repository can show. Remaining decision records, a full sanitised evidence index pairing every claim with its artefact, and CI coverage of the Sentinel root are outside this release — by decision, not by deferral. Where a claim is ahead of its evidence, this README says so.
 
 ## Why this exists
 
@@ -58,7 +58,7 @@ Modules 03–06 are **out of scope for v1.0**. This is a decision, not a backlog
 | 05 | update-rings | Same provider boundary |
 | 06 | defender-endpoint | Same provider boundary; also depends on 03 |
 
-Three Terraform providers were evaluated as alternatives (`microsoft/msgraph` public preview, `deploymenttheory/microsoft365`, `terraprovider/microsoft365wp`). None was adopted for this release. The directories are retained with their design notes: a documented scope boundary is evidence of a decision, whereas a deleted directory is evidence of nothing. The decision record for this — including the specific conditions that would cause it to be revisited — is in preparation.
+Three Terraform providers were evaluated as alternatives (`microsoft/msgraph` public preview, `deploymenttheory/microsoft365`, `terraprovider/microsoft365wp`). None was adopted for this release. The directories are retained with their design notes: a documented scope boundary is evidence of a decision, whereas a deleted directory is evidence of nothing. The reasoning, the rejected alternatives, and what would change the assessment are recorded in [ADR-006](docs/adr/adr-006-device-management-out-of-scope.md).
 
 ### Conditional Access policy set (module 02)
 
@@ -87,7 +87,7 @@ These are **lab baselines, not production detections**: no entity mapping, no al
 
 ### Emergency access
 
-Two standing Global Administrator accounts, excluded from all four Conditional Access policies, with passkey authentication and Sentinel alerting on their sign-ins.
+Two standing Global Administrator accounts, excluded from all four Conditional Access policies, with passkey authentication and Sentinel alerting on their interactive sign-ins.
 
 A **role-assignable parallel exclusion group** is code-defined and applied, with dual exclusions and Sentinel membership monitoring. Public validation evidence is pending. The `isAssignableToRole` property cannot be added to an existing group, so migration was staged additively across four reviewed plans rather than replacing the original group — a replacement would have changed the object ID that every Conditional Access policy references. The legacy exclusion remains active; its retirement is deliberately deferred pending an observation period.
 
@@ -117,23 +117,99 @@ That is related identity-lifecycle work, but it is **not** an implementation of 
 
 ## Deploy it yourself
 
+> **This is a lab bootstrap sequence, not a production installer.** It is written for a disposable
+> tenant you are willing to lose. Do not run it against a tenant anyone depends on.
+
 **Prerequisites:** Terraform ≥ 1.7, Azure CLI, a disposable Entra tenant, and Entra ID P2 (for risk-based Conditional Access and PIM). The detections root additionally requires an Azure subscription for the Log Analytics workspace and Sentinel.
+
+**Why this is staged.** A single `terraform apply` of the identity root would create the emergency
+accounts and enable Conditional Access in the same operation. Terraform has no dependency edge
+between the Global Administrator assignment and the policy modules, and the emergency accounts'
+passkeys are registered in the portal, not in code — so that apply can begin enforcing MFA on every
+user in the tenant at a moment when no emergency account can yet satisfy Microsoft's mandatory portal
+MFA. Being excluded from a Conditional Access policy is not a recovery path if the account cannot sign
+in. The stages below exist to make the recovery path real *before* enforcement starts.
+
+Every stage plans to a file and applies that file. Several of these applies modify live Conditional
+Access exclusions, where "the plan I reviewed is the plan that ran" stops being a formality.
 
 ```bash
 az login --tenant <your-tenant-id>
-
-# identity root
 cd terraform
-terraform init && terraform plan -out tfplan && terraform apply tfplan
+terraform init
+```
 
-# detections root (separate state)
+### Stage 1 — emergency access first, nothing else
+
+`-target` is used deliberately here. HashiCorp documents it as an exceptional-case tool, and
+bootstrapping a recovery path before the controls that could lock you out is the exception.
+
+```bash
+terraform plan -out stage1.tfplan \
+  -target=azuread_directory_role_assignment.break_glass_global_administrator \
+  -target=azuread_group.break_glass_exclude \
+  -target=azuread_group.break_glass_exclude_role_assignable
+terraform apply stage1.tfplan
+```
+
+Terraform pulls the two accounts and their generated passwords in as dependencies. No Conditional
+Access policy is created by this stage.
+
+**Gate — verify in the Entra admin center before continuing:**
+
+- both accounts exist and are enabled;
+- **both** exclusion groups exist and **each contains both accounts**;
+- both accounts hold **active** Global Administrator, not eligible.
+
+### Stage 2 — register and test a passkey on each account, in the portal
+
+Register a **separate** passkey per account. Then, in a private browser window per account, sign in as
+each one independently and confirm it reaches the Entra admin center with Global Administrator.
+
+**Gate — do not continue until both accounts have independently signed in and reached the admin
+center.** This is the stage the one-shot sequence skipped. An emergency account that has never
+completed a sign-in is an untested control.
+
+### Stage 3 — confirm your own account can survive enforcement
+
+Confirm the account you are deploying with is registered for MFA. CA002 targets all users, and you are
+not excluded.
+
+### Stage 4 — disable Security Defaults
+
+Entra admin center → **Properties** → **Manage security defaults** → Disabled. There is no clean
+provider resource for this toggle.
+
+The tenant is least protected between this stage and the next. Do not leave it here.
+
+### Stage 5 — Conditional Access
+
+```bash
+terraform plan -out stage5.tfplan
+terraform apply stage5.tfplan
+```
+
+Read the plan. This apply enables CA001–CA003 and creates CA004 in report-only.
+
+**Gate — verify after applying:** open each of the four policies and confirm **both** exclusion groups
+appear under Users → Exclude. Then use **Conditional Access What If** for an emergency account and
+confirm no policy applies to it.
+
+### Stage 6 — detections root (separate state)
+
+```bash
 cd detections
 terraform init && terraform plan -out tfplan && terraform apply tfplan
 ```
 
-Conditional Access requires Security Defaults to be **disabled** first — see [ADR-002](docs/adr/adr-002-break-glass-exclusion.md) for the safe sequence and the emergency-access design that makes it safe.
+### Recovery
 
-Apply from a saved plan file. Several of these applies modify live Conditional Access exclusions, where "the plan I reviewed is the plan that ran" stops being a formality.
+If you lose access, sign in with an emergency account — which is why stage 2 exists — and either set
+the offending policy to Off in the portal or `terraform destroy -target` the module that created it.
+Fix the policy in configuration afterwards; a portal fix that does not exist in code has an expiry
+date attached to it.
+
+The emergency-access design and its trade-offs are in [ADR-002](docs/adr/adr-002-break-glass-exclusion.md).
 
 ## Known limitations
 

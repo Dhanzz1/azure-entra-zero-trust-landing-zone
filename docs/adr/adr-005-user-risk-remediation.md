@@ -26,20 +26,20 @@ Deploy `ZT-High-User-Risk-Remediation` as a report-only Conditional Access polic
 - state: `enabledForReportingButNotEnforced`
 - exclusions: break-glass group and guest/external users
 
-Admins are deliberately in scope for this reference context. At the target size of roughly 100-500 users, self-remediation applies to everyone, and the Phase 3 phishing-resistant admin policy stacks on top without changing this policy. At enterprise scale, admin user risk would usually route to a security-team investigation and recovery path instead of automatic self-remediation.
+Admins are deliberately in scope for this reference context. At the target size of roughly 100-500 users, self-remediation applies to everyone, and a phishing-resistant admin policy, were one added, would stack on top without changing this policy. At enterprise scale, admin user risk would usually route to a security-team investigation and recovery path instead of automatic self-remediation.
 
 Guests are excluded because they cannot change their home-tenant password in this tenant. The pattern is: guests receive authentication and risk controls they can satisfy, and are excluded from password or device controls they cannot satisfy.
 
 ## Consequences
 
 - **Positive:** Gives compromised users a recovery path instead of only blocking access.
-- **Positive:** Aligns Phase 1 with Microsoft's user-risk remediation guidance.
-- **Positive:** Keeps CA004 in report-only until real tenant impact is observed.
+- **Positive:** Aligns this release with Microsoft's user-risk remediation guidance.
+- **Positive:** Keeps CA004 in report-only, so the policy is evaluated without risking a lockout loop for a user who is not registered for MFA and so cannot self-remediate. Promotion to enforced is cut from this release, not pending observation.
 - **Negative:** Requires MFA registration before users can self-remediate.
 - **Negative:** Requires Entra ID P2 / ID Protection licensing.
 
 ## Alternatives Considered
 
 - **Block high user risk** — rejected because it creates an administrator-dependent recovery path for legitimate users.
-- **Exclude admins from CA004** — rejected for this reference context; admin-specific hardening arrives in Phase 3 and stacks on top.
+- **Exclude admins from CA004** — rejected for this reference context; admin-specific hardening is out of scope for this release and would stack on top.
 - **Create a service-account exclusion group now** — rejected because no service accounts exist in the demo tenant. A production scale-up would add a service-account exclusion group and migrate automation to managed identities or workload identity controls.

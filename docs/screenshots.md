@@ -4,7 +4,7 @@ Sanitised proof that the Terraform deployed to a live tenant. The repo proves th
 
 ## Conditional Access
 ![Conditional Access policy list](screenshots/ca-policy-list.png)
-*Current Phase 1 policy list: CA001-CA003 are On, and CA004 `ZT-High-User-Risk-Remediation` is Report-only.*
+*Current policy list: CA001-CA003 are On, and CA004 `ZT-High-User-Risk-Remediation` is Report-only.*
 
 ![CA001 What If — internal user legacy client](screenshots/ca001-legacy-auth-what-if-setup.png)
 ![CA001 What If result — legacy client blocked](screenshots/ca001-legacy-auth-what-if-result.png)

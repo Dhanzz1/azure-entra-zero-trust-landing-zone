@@ -2,8 +2,8 @@
 
 ## Assumptions
 
-- A single disposable **developer/lab Entra tenant** is used; Entra objects are free and persistent, so the lab is left standing between phases.
-- **Trial licensing**: Entra ID P2 for risk-based Conditional Access and PIM; Intune/Defender trials are activated per phase. Features requiring premium licences are noted per module.
+- A single disposable **developer/lab Entra tenant** is used; Entra objects are free and persistent, so the lab is left standing between working sessions.
+- **Trial licensing**: Entra ID P2 for risk-based Conditional Access and PIM. No device-management licensing is used — Intune and Defender for Endpoint are out of scope for this release. Features requiring premium licences are noted per module.
 - **Local Terraform state** for the demo. A production setup would use a remote backend (Azure Storage) with state locking — intentionally out of scope here.
 - Authentication to Azure is via interactive `az login`; a least-privilege service principal would replace this for CI/CD.
 
@@ -11,7 +11,7 @@
 
 - This is a **reference implementation**, not a production-hardened, multi-tenant framework.
 - Cloud-only: no hybrid AD, on-premises infrastructure, or network security (NSG/firewall).
-- Modules ship in phases; the README status table is the source of truth for what is implemented versus designed.
+- The README control-status table is the source of truth for what is implemented versus designed. v1.0 is the terminal release of this repository; modules marked out of scope are decisions, not deferrals.
 - Some tenant settings are configured manually because the `azuread` provider lacks first-class resources (see below).
 
 ## Human Validation Boundaries
@@ -36,7 +36,7 @@ Configured manually because the `azuread` provider does not currently provide cl
 - Group naming policy: Entra admin center -> Groups -> Naming policy.
 - Group-based licensing for assigning the EMS E5 / Entra ID P2 licence to `All-Members-Dynamic`: Entra admin center -> Groups -> All-Members-Dynamic -> Licenses.
 - Security Defaults: disabled manually (Entra -> Properties -> Manage security defaults) to allow custom Conditional Access; there is no clean provider resource for this toggle.
-- Location-based admin restrictions are intentionally deferred until the Phase 3 admin-location Conditional Access policy that consumes them is implemented.
-- Guest authorization is handled through collaboration membership, SharePoint sharing settings, and Phase 3 governance rather than a Phase 1 guest-specific Conditional Access policy.
+- Location-based admin restrictions are out of scope for v1.0; no admin-location Conditional Access policy consumes them.
+- Guest authorization is handled through collaboration membership and SharePoint sharing settings rather than a guest-specific Conditional Access policy; broader guest governance is out of scope for v1.0.
 
 These manual items are candidates to move into code later through Microsoft Graph or AzAPI once provider support matures. Until then, automation should be described as supporting the baseline with human validation rather than fully replacing portal configuration.

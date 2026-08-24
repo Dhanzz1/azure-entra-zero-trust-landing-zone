@@ -12,7 +12,8 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.6"
     }
-    # azurerm / azapi are intentionally omitted until Phase 2/3.
+    # azurerm / azapi are intentionally omitted from this root; the Sentinel
+    # root (terraform/detections) declares azurerm separately.
     # Declaring a provider you haven't configured can trigger auth errors,
     # and azuread needs no Azure subscription — keep Step 1 dependency-free.
   }
