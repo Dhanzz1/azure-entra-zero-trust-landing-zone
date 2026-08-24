@@ -12,7 +12,7 @@ Apply least-privilege to administration: standing privilege only for passkey-pro
 
 - Two cloud-only **break-glass** accounts with **permanent Global Administrator** (deliberately not PIM-eligible), excluded from repository-managed Conditional Access via the `CA-BreakGlass-Exclude` group. Both use portal-managed, separately tested synced passkeys to satisfy Microsoft's mandatory portal MFA. The account/group baseline is implemented in `terraform/break-glass.tf`; the passkeys are portal-managed. See [ADR-002](../docs/adr/adr-002-break-glass-exclusion.md).
 - A **role-assignable parallel exclusion group** (`CA-BreakGlass-Exclude-RoleAssignable`) is code-defined and applied, with dual exclusions and Sentinel membership monitoring. Public validation evidence is pending. The legacy exclusion remains active; retirement is deliberately deferred pending an observation period.
-- **Sentinel monitoring is deployed and tested** (module 07): an alert on emergency-account sign-in, and an alert on membership changes to the protected exclusion groups. Both have fired on real events. This is the compensating control for the standing Global Administrator accounts.
+- **Sentinel monitoring is deployed and tested** (module 07): an alert on emergency-account **interactive** sign-in, and an alert on membership changes to the protected exclusion groups. Both have fired on real events. This is the compensating control for the standing Global Administrator accounts — and its boundary is part of the control: a non-interactive emergency-account sign-in would not alert, because the rule query reads `SigninLogs` only. See [module 07 limitations](../07-sentinel-kql/README.md#limitations).
 
 ## Privileged Identity Management
 

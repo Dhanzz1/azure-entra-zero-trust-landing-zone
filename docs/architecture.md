@@ -9,7 +9,7 @@ All ADR trade-offs are written against this context; larger enterprises may choo
 ## Design principles
 This landing zone applies the three Zero Trust tenets. Device trust is a tenet of the model, not a control this release implements:
 - **Verify explicitly** — every access decision uses identity and risk signals (Conditional Access + Identity Protection). Device state is a designed input to the same decision point, but no device signal is collected here and no policy consumes one.
-- **Least privilege** — standing privilege is limited to two passkey-protected emergency accounts, and a Sentinel analytics rule alerts on their sign-ins. Day-to-day admin is designed around PIM: the eligible assignment and role-activation settings (just-in-time, MFA, justification) were configured and exercised in the portal during the licensed lab window rather than defined in code.
+- **Least privilege** — standing privilege is limited to two passkey-protected emergency accounts, and a Sentinel analytics rule alerts on their interactive sign-ins. Day-to-day admin is designed around PIM: the eligible assignment and role-activation settings (just-in-time, MFA, justification) were configured and exercised in the portal during the licensed lab window rather than defined in code.
 - **Assume breach** — legacy authentication blocked, high sign-in risk blocked, three Sentinel analytics rules deployed as code, and the emergency-access exclusion groups themselves monitored for membership change.
 
 ## Identity-First Control Map
@@ -37,7 +37,7 @@ Conditional Access is the central control plane (Policy Decision Point in Zero T
 Sequencing and dependencies as built:
 1. **01 identity-baseline** must exist first — break-glass access and dynamic groups are inputs to downstream Conditional Access and governance work.
 2. **02 conditional-access** consumes the break-glass exclusion groups; Security Defaults must be disabled before it can run.
-3. **07 sentinel** consumes the tenant-scoped Entra log export, and monitors both the emergency accounts and the exclusion groups that make them exempt.
+3. **07 sentinel** consumes the tenant-scoped Entra log export, and monitors the emergency accounts' interactive sign-ins and membership changes to the exclusion groups that make them exempt.
 4. **09 administrative-governance** supplies the privileged-access model: PIM eligibility for day-to-day admin, and standing Global Administrator confined to the two emergency accounts.
 
 Modules **03 device-compliance** and **06 defender-endpoint** would have fed a "require compliant device" signal back into 02. That path is out of scope for this release; the reasoning is in the [scope boundary](../README.md#scope-boundary).

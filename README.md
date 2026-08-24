@@ -87,7 +87,7 @@ These are **lab baselines, not production detections**: no entity mapping, no al
 
 ### Emergency access
 
-Two standing Global Administrator accounts, excluded from all four Conditional Access policies, with passkey authentication and Sentinel alerting on their sign-ins.
+Two standing Global Administrator accounts, excluded from all four Conditional Access policies, with passkey authentication and Sentinel alerting on their interactive sign-ins.
 
 A **role-assignable parallel exclusion group** is code-defined and applied, with dual exclusions and Sentinel membership monitoring. Public validation evidence is pending. The `isAssignableToRole` property cannot be added to an existing group, so migration was staged additively across four reviewed plans rather than replacing the original group — a replacement would have changed the object ID that every Conditional Access policy references. The legacy exclusion remains active; its retirement is deliberately deferred pending an observation period.
 

@@ -23,5 +23,5 @@ Primary misuse, compromise, and bypass scenarios modelled here: MFA bypass via l
 - Threat 5 is modelled but not mitigated. Device management is out of scope for this release by decision, not deferral — see the [scope boundary](../README.md#scope-boundary).
 - Threat 8 is partly mitigated through collaboration membership and SharePoint sharing controls; access reviews are out of scope.
 - Threat 6 rests on portal configuration rather than code, and its evidence is not published.
-- Standing Global Administrator on the break-glass accounts is an accepted lab risk. Passkeys are tested and sign-ins are monitored by the module 07 detection; the compensating-control reasoning is in ADR-002.
+- Standing Global Administrator on the break-glass accounts is an accepted lab risk. Passkeys are tested and interactive sign-ins are monitored by the module 07 detection; the compensating-control reasoning is in ADR-002.
 - This is a portfolio threat model for a lab tenant, not an exhaustive enterprise assessment.

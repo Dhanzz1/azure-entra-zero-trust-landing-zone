@@ -35,4 +35,4 @@ Threat: compromise that slips past preventive controls (stolen tokens, insider m
 
 Trade-off: noisy rules cause alert fatigue; rules are tuned and prioritised over raw coverage.
 
-Exception handling: the break-glass sign-in alert is the compensating control for the standing Global Admin accounts (see [ADR-002](../docs/adr/adr-002-break-glass-exclusion.md)).
+Exception handling: the break-glass **interactive** sign-in alert is the compensating control for the standing Global Admin accounts (see [ADR-002](../docs/adr/adr-002-break-glass-exclusion.md)), bounded as described under [Limitations](#limitations) above.
