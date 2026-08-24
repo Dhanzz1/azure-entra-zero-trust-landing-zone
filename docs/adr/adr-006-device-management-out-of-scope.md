@@ -65,7 +65,8 @@ That is a property of the design, not a commitment to build it.
   Either candidate may be a sound choice elsewhere; neither is a foundation this project can support,
   and adopting one would import a maintenance obligation the scope does not justify.
 - **Configure Intune in the portal and document it as portal-managed** — rejected. That pattern is
-  used for PIM, where the control is genuinely exercised and evidenced. Repeating it across four
+  used for PIM, where the control was genuinely configured and exercised during the licensed lab
+  window, with public evidence pending. Repeating it across four
   modules would turn an infrastructure-as-code repository into a screenshot collection.
 - **Delete the four directories** — rejected. Removing them would erase the decision along with the
   scope, leaving no record that the boundary was reached deliberately.
