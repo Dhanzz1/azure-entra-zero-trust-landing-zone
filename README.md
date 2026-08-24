@@ -1,6 +1,6 @@
 # Azure Entra Zero Trust Landing Zone
 
-[![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A5%201.7-7B42BC?logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform) ![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-0078D4?logo=microsoftazure&logoColor=white) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) ![Release: v0.1.0](https://img.shields.io/badge/Release-v0.1.0-blue) ![Scope: identity and detection](https://img.shields.io/badge/Scope-identity%20%2B%20detection-informational)
+[![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A5%201.7-7B42BC?logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform) ![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-0078D4?logo=microsoftazure&logoColor=white) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) ![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-blue) ![Scope: identity and detection](https://img.shields.io/badge/Scope-identity%20%2B%20detection-informational)
 
 A **Terraform-driven** Zero Trust identity baseline for Microsoft Entra ID, built and evidenced in a live lab tenant. Conditional Access policies, emergency-account and exclusion-group configuration, and Sentinel detections are defined as code. Passkeys and PIM are portal-managed.
 

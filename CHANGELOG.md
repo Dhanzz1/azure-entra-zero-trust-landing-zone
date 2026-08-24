@@ -8,9 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 > fixed meanings defined in the [README](README.md#control-status) — "Complete" is deliberately not
 > a status.
 
-## [Unreleased]
-
-Work completed since v0.1.0. This section becomes `[1.0.0]` at tag.
+## [1.0.0] - 2026-08-24 — Identity and detection baseline, terminal release
 
 ### Added
 - **Sentinel detections as code (module 07):** Log Analytics workspace, tenant-scoped Entra
@@ -62,5 +60,5 @@ First public release. The identity baseline and the Conditional Access framework
 ### Security
 - No secrets, tenant identifiers, or Terraform state in the repository. State, `*.tfvars`, plan files, and provider schema are gitignored. Screenshots are sanitised (tenant and subscription IDs cropped); everything was built in a disposable developer tenant.
 
-[Unreleased]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/compare/v0.1.0...HEAD
+[1.0.0]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/releases/tag/v1.0.0
 [0.1.0]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/releases/tag/v0.1.0
