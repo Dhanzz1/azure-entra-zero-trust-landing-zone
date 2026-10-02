@@ -43,4 +43,4 @@ Threat: inconsistent, hand-crafted CA policies drift and leave gaps that attacke
 
 Trade-off: a shared module trades a little upfront abstraction for consistency, reviewability, and reuse across every policy.
 
-Exception handling: every policy built from this module excludes the break-glass group, guaranteeing an emergency-access path.
+Exception handling: every policy in this repository passes both emergency exclusion groups to the module. The module does not enforce that: `excluded_group_object_ids` defaults to empty, and its precondition only rejects an enabled block-all-users policy with no exclusions. Callers are responsible for the emergency-access path.

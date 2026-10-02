@@ -11,7 +11,7 @@
 
 - This is a **reference implementation**, not a production-hardened, multi-tenant framework.
 - Cloud-only: no hybrid AD, on-premises infrastructure, or network security (NSG/firewall).
-- The README control-status table is the source of truth for what is implemented versus designed. v1.0 is the terminal release of this repository; modules marked out of scope are decisions, not deferrals.
+- The README control-status table is the source of truth for what is implemented versus designed. The repository is an archived lab: evidence was captured between July and August 2026 and the trial licences have since expired. Modules marked out of scope are recorded decisions (ADR-006).
 - Some tenant settings are configured manually because the `azuread` provider lacks first-class resources (see below).
 
 ## Human Validation Boundaries
@@ -39,4 +39,4 @@ Configured manually because the `azuread` provider does not currently provide cl
 - Location-based admin restrictions are out of scope for v1.0; no admin-location Conditional Access policy consumes them.
 - Guest authorization is handled through collaboration membership and SharePoint sharing settings rather than a guest-specific Conditional Access policy; broader guest governance is out of scope for v1.0.
 
-These manual items are candidates to move into code later through Microsoft Graph or AzAPI once provider support matures. Until then, automation should be described as supporting the baseline with human validation rather than fully replacing portal configuration.
+These manual items are candidates to move into code later through a Microsoft Graph-based provider once support matures. AzAPI is not an option for them: it targets Azure Resource Manager, and these settings live in Microsoft Graph (see ADR-006). Until then, automation should be described as supporting the baseline with human validation rather than fully replacing portal configuration.

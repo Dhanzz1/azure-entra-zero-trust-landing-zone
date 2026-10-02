@@ -1,18 +1,12 @@
 # Azure Entra Zero Trust Landing Zone
 
-[![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A5%201.7-7B42BC?logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform) ![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-0078D4?logo=microsoftazure&logoColor=white) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) ![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-blue) ![Scope: identity and detection](https://img.shields.io/badge/Scope-identity%20%2B%20detection-informational)
+[![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A5%201.7-7B42BC?logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform) ![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-0078D4?logo=microsoftazure&logoColor=white) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) ![Release: v1.0.1](https://img.shields.io/badge/Release-v1.0.1-blue) ![Scope: identity and detection](https://img.shields.io/badge/Scope-identity%20%2B%20detection-informational)
 
-A **Terraform-driven** Zero Trust identity baseline for Microsoft Entra ID, built and evidenced in a live lab tenant. Conditional Access policies, emergency-account and exclusion-group configuration, and Sentinel detections are defined as code. Passkeys and PIM are portal-managed.
+A **Terraform-driven** Zero Trust identity baseline for Microsoft Entra ID, built and tested in a lab tenant. Four Conditional Access policies are rendered from one reusable module. Two emergency accounts use passkeys and sit behind two exclusion groups. Three Sentinel analytics rules watch that emergency path. All of it is defined as code.
 
-The standard this repository holds itself to: controls are defined as code, design decisions are recorded as Architectural Decision Records, and claims are paired with the artefact that licenses them. Where that standard is not yet met — a decision record still to be written, evidence not yet published — this README says so rather than implying otherwise.
+Start with the evidence: [What If results, test sign-ins, Sentinel alerts and ingestion measurements](docs/screenshots.md), and the [decision records](docs/adr/) behind each trade-off.
 
-> **Scope.** This repository covers **identity and detection**. The device-management area (Intune, Autopilot, update rings, Defender for Endpoint) was designed, evaluated, and then deliberately placed **out of scope** — see [Scope boundary](#scope-boundary) for the reasoning. Privileged Identity Management was configured and exercised in the portal; it is **not code-defined**, and its evidence is not yet published. Nothing here claims to be a complete Zero Trust implementation.
-
-## What v1.0 is
-
-v1.0 is the **terminal** release of this repository, not a milestone toward a larger roadmap. Its scope is an identity and detection baseline: tenant hardening, four Conditional Access policies rendered from one reusable module, emergency access with a role-assignable exclusion group, Privileged Identity Management exercised in the portal, and three Sentinel analytics rules defined as code. Device management is out of scope by decision, not by deferral.
-
-Reaching v1.0 additionally required a documentation truth pass across every public document, so that no published claim outruns what this repository can show. Remaining decision records, a full sanitised evidence index pairing every claim with its artefact, and CI coverage of the Sentinel root are outside this release — by decision, not by deferral. Where a claim is ahead of its evidence, this README says so.
+> **Status: archived lab.** Built and evidenced between July and August 2026 in a trial tenant. The licences have since expired, so every result here is historical and dated. It describes what was tested, not a running environment. Device management (Intune, Autopilot, update rings, Defender for Endpoint) is out of scope for this repository; see [Scope boundary](#scope-boundary). Privileged Identity Management was configured in the portal and is not code-defined; see [Known limitations](#known-limitations).
 
 ## Why this exists
 
@@ -37,12 +31,12 @@ Device-management controls are not shown; they are out of scope for this release
 
 ### Control status
 
-Statuses below are used with fixed meanings: **Planned** (design only), **Code-defined** (configuration exists, no verified deployment), **Deployed** (object exists in the lab), **Report-only evaluated** (evaluated without enforcement), **Enabled and tested** (enforced, with a safe test and evidence record), **Portal-managed and evidenced** (implemented manually, with configuration and operational proof). "Complete" is deliberately not a status.
+Statuses below are used with fixed meanings: **Planned** (design only), **Code-defined** (configuration exists, no verified deployment), **Deployed** (object exists in the lab), **Report-only evaluated** (evaluated without enforcement), **Enabled and tested** (enforced, with a safe test and evidence record), **Enabled; What If tested** (enforced, and tested with Conditional Access What If rather than a live triggering event), **Portal-managed and evidenced** (implemented manually, with configuration and operational proof). "Complete" is deliberately not a status.
 
 | # | Module | Purpose | Zero Trust pillar | Status |
 |---|--------|---------|-------------------|--------|
 | 01 | identity-baseline | Tenant hardening, dynamic groups, emergency access | Identity | Enabled and tested |
-| 02 | conditional-access | CA policy framework as reusable Terraform | Identity | Enabled and tested (CA004: Report-only evaluated) |
+| 02 | conditional-access | CA policy framework as reusable Terraform | Identity | Enabled and tested (CA001, CA003: What If tested; CA004: Report-only evaluated) |
 | 07 | sentinel-kql | Sentinel workspace, Entra log export, KQL detections as code | Detection | Deployed; see [detection detail](#sentinel-detections-module-07) |
 | 09 | administrative-governance | Emergency access | Identity / Governance | Enabled and tested |
 | 08 | cloud-lifecycle-automation | Cloud-only joiner/mover/leaver automation | Automation | Planned — not implemented; see [Linked work](#linked-work) |
@@ -64,9 +58,9 @@ Three Terraform providers were evaluated as alternatives (`microsoft/msgraph` pu
 
 | ID | Policy | State |
 |---|---|---|
-| CA001 | Block legacy authentication | Enabled and tested |
+| CA001 | Block legacy authentication | Enabled; What If tested |
 | CA002 | Require MFA for all users, emergency accounts excluded | Enabled and tested |
-| CA003 | Block high-risk sign-ins (Entra ID Protection / P2) | Enabled and tested |
+| CA003 | Block high-risk sign-ins (Entra ID Protection / P2) | Enabled; What If tested |
 | CA004 | Remediate high user risk with MFA + secure password change | Report-only evaluated |
 
 All four policies are rendered from a single reusable Terraform module and exclude the dedicated emergency-access groups. Both the legacy group and the role-assignable group are currently in the active exclusion path for every one of the four policies.
@@ -80,16 +74,16 @@ A Log Analytics workspace with Microsoft Sentinel, a tenant-scoped Entra diagnos
 | Detection | Status |
 |---|---|
 | Emergency account sign-in | Enabled and tested — fired on a real emergency-account sign-in |
-| Protected exclusion group membership changed | Enabled and tested — fired on a real membership change to the live exclusion group |
+| Protected exclusion group membership changed | Enabled and tested; fired on a real membership change to a canary group, then retargeted to both exclusion groups |
 | Password-spray indicator | Deployed and query-validated; no positive event generated, and none simulated |
 
-These are **lab baselines, not production detections**: no entity mapping, no allowlists, no assigned owner, no response procedure. Rule frequency and lookback windows deliberately overlap, which produces occasional duplicate alerts — a documented, accepted trade-off rather than a tuning defect. Ingestion lag was measured rather than assumed (sign-in logs averaged ~1.5 minutes, audit logs ~3.4 minutes with an observed maximum of 7, following a ~15-hour delay on first enablement).
+These are **lab baselines, not production detections**: no entity mapping, no allowlists, no assigned owner, no response procedure. The membership rule runs every 5 minutes over a 15-minute lookback, so it can raise duplicate alerts; this is an accepted trade-off. The other two rules use a lookback equal to their frequency. The spray rule counts every non-zero `ResultType`, so MFA interrupts can push it over threshold; it was never tested against a positive event. Ingestion lag was measured rather than assumed (sign-in logs averaged ~1.5 minutes, audit logs ~3.4 minutes with an observed maximum of 7, following a ~15-hour delay on first enablement).
 
 ### Emergency access
 
 Two standing Global Administrator accounts, excluded from all four Conditional Access policies, with passkey authentication and Sentinel alerting on their interactive sign-ins.
 
-A **role-assignable parallel exclusion group** is code-defined and applied, with dual exclusions and Sentinel membership monitoring. Public validation evidence is pending. The `isAssignableToRole` property cannot be added to an existing group, so migration was staged additively across four reviewed plans rather than replacing the original group — a replacement would have changed the object ID that every Conditional Access policy references. The legacy exclusion remains active; its retirement is deliberately deferred pending an observation period.
+A **role-assignable parallel exclusion group** is code-defined and applied, with dual exclusions and Sentinel membership monitoring. Its properties and the retargeted rule are shown in the [evidence](docs/screenshots.md) (screenshots v1-17 and v1-19); the membership alert itself was validated on a canary group. The `isAssignableToRole` property cannot be added to an existing group, so migration was staged additively across four reviewed plans rather than replacing the original group — a replacement would have changed the object ID that every Conditional Access policy references. The legacy exclusion remains active; its retirement is deliberately deferred pending an observation period.
 
 The exclusions apply to **this repository's** Conditional Access policies. They do not bypass Microsoft's mandatory portal MFA, and the emergency accounts still authenticate with their passkeys.
 
@@ -229,7 +223,7 @@ The emergency-access design and its trade-offs are in [ADR-002](docs/adr/adr-002
 
 ## Security & sanitisation
 
-This repository contains **no secrets, tenant identifiers, or state**. Terraform state, `*.tfvars`, plan files and provider schema are gitignored. Screenshots are sanitised — tenant and subscription identifiers, source IP addresses and credential-provider detail are cropped or redacted. Everything was built in a disposable developer tenant.
+This repository contains **no secrets or Terraform state**. State, `*.tfvars`, plan files and provider schema are gitignored. Tenant and subscription IDs and source IP addresses are redacted from screenshots. Lab identifiers (the `onmicrosoft.com` domain, emergency-account UPNs and object IDs) are left visible so the evidence can be cross-checked. Everything was built in a disposable trial tenant.
 
 ## License
 

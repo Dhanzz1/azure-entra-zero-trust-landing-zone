@@ -3,10 +3,30 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-> **Status: v1.0 is the terminal release of this repository.** Scope is an identity and detection
-> baseline; device management is out of scope by decision, not deferral. Control statuses use the
-> fixed meanings defined in the [README](README.md#control-status) — "Complete" is deliberately not
-> a status.
+> **Status: archived lab.** Scope is an identity and detection baseline, evidenced between July and
+> August 2026 in a trial tenant whose licences have since expired. Device management is out of scope
+> (ADR-006). Control statuses use the fixed meanings defined in the [README](README.md#control-status).
+
+## [1.0.1] - 2026-10-02 - Close-out
+
+### Changed
+- README opening rewritten to lead with what was built and the evidence, and to mark the repository
+  as an archived lab with historical, dated evidence.
+- CA001 and CA003 relabelled **Enabled; What If tested**, a new status in the README vocabulary.
+  Their published evidence is What If evaluation, not a live triggering event.
+- Exclusion-group membership detection described as validated on a canary group and then
+  retargeted. No alert from a change to the exclusion groups themselves was captured.
+- Threat 8 (external oversharing) restated as not mitigated by this repository, matching ADR-004.
+- Sanitisation statement narrowed: lab identifiers (domain, UPNs, object IDs) are visible by design.
+
+### Fixed
+- Rule-overlap wording: only the membership rule's lookback exceeds its frequency.
+- Conditional Access module README no longer claims the module guarantees an emergency-access path.
+- Assumptions no longer suggest AzAPI for Graph-hosted tenant settings, which contradicted ADR-006.
+- CI now runs `init` and `validate` for the detections root as well as the identity root.
+
+### Documented
+- Password-spray rule limitation: it counts every non-zero `ResultType`, including MFA interrupts.
 
 ## [1.0.0] - 2026-08-24 — Identity and detection baseline, terminal release
 
@@ -60,5 +80,6 @@ First public release. The identity baseline and the Conditional Access framework
 ### Security
 - No secrets, tenant identifiers, or Terraform state in the repository. State, `*.tfvars`, plan files, and provider schema are gitignored. Screenshots are sanitised (tenant and subscription IDs cropped); everything was built in a disposable developer tenant.
 
+[1.0.1]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/releases/tag/v1.0.0
 [0.1.0]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/releases/tag/v0.1.0

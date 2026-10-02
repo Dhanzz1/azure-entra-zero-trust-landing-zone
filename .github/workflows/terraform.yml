@@ -10,9 +10,16 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        root:
+          - terraform
+          - terraform/detections
+
     defaults:
       run:
-        working-directory: terraform
+        working-directory: ${{ matrix.root }}
 
     steps:
       - name: Checkout

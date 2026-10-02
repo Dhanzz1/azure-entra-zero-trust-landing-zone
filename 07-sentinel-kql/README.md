@@ -11,7 +11,7 @@ Add the "assume breach" layer: detections that surface identity and device attac
 - A **Log Analytics workspace with Microsoft Sentinel enabled**, and a **tenant-scoped Entra diagnostic setting** exporting interactive sign-in, non-interactive sign-in, and audit logs. Defined in Terraform in `terraform/detections/` — a separate root with its own state, using the `azurerm` provider.
 - **Three scheduled analytics rules**, with KQL defined as code:
   - **Emergency account sign-in** — *Enabled and tested*; fired on a real emergency-account sign-in.
-  - **Protected exclusion group membership changed** — *Enabled and tested*; fired on a real membership change to the live exclusion group, and the deployed rule targets both terminal exclusion groups.
+  - **Protected exclusion group membership changed** — *Enabled and tested*; fired on a real membership change to a temporary canary group, then retargeted to both emergency exclusion groups. No alert has been captured from a change to the exclusion groups themselves.
   - **Password-spray indicator** — *Deployed and query-validated; no positive event generated, and none simulated.*
 - A **daily ingestion cap** on the workspace.
 
@@ -19,7 +19,9 @@ Add the "assume breach" layer: detections that surface identity and device attac
 
 These are lab baselines, not production detections: no entity mapping, no allowlists, no assigned owner, and no response procedure.
 
-Rule frequency and lookback windows deliberately overlap, producing occasional duplicate alerts. This is an accepted trade-off, not a tuning defect.
+The membership rule runs every 5 minutes over a 15-minute lookback, so it can raise duplicate alerts. This is an accepted trade-off. The emergency-account rule (5 minutes) and the spray rule (10 minutes) use a lookback equal to their frequency, with no extra allowance for ingestion delay.
+
+The password-spray rule counts every non-zero `ResultType`. That includes MFA interrupts such as 50074 and 50140, so a few users completing MFA behind one shared IP can cross the threshold. A production version would filter to credential failures such as 50126. The rule was never tested against a positive event.
 
 Ingestion lag was measured rather than assumed: sign-in logs averaged ~1.5 minutes and audit logs ~3.4 minutes, with an observed maximum of 7 minutes, following an approximately 15-hour delay on first enablement.
 
