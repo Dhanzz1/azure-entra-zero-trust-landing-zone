@@ -26,7 +26,7 @@ SSPR, password protection, group naming policy and group-based licensing have no
 | --- | --- | --- | --- |
 | Self-service password reset (SSPR) | Allows users to recover access through approved password reset methods, reducing helpdesk dependency and weak manual recovery paths. | Entra admin center -> Protection -> Password reset | Portal-managed in this lab under `hashicorp/azuread ~> 2.50`; no public evidence. |
 | Password protection | Applies custom banned-password terms and smart lockout settings to reduce password guessing and tenant-specific weak password choices. | Entra admin center -> Protection -> Authentication methods -> Password protection | Portal-managed in this lab under `hashicorp/azuread ~> 2.50`; no public evidence. |
-| Group naming policy | Sets naming expectations for Microsoft 365 and security groups to reduce unmanaged group sprawl. | Entra admin center -> Groups -> Naming policy | Portal-managed in this lab under `hashicorp/azuread ~> 2.50`; no public evidence. |
+| Group naming policy | Sets naming expectations for Microsoft 365 groups to reduce unmanaged group sprawl. It does not apply to security groups. | Entra admin center -> Groups -> Naming policy | Portal-managed in this lab under `hashicorp/azuread ~> 2.50`; no public evidence. |
 | Group-based licensing | Assigns the EMS E5 / Entra ID P2 licence to the `All-Members-Dynamic` group. | Entra admin center -> Groups -> All-Members-Dynamic -> Licenses | Portal-managed in this lab under `hashicorp/azuread ~> 2.50`; no public evidence. |
 
 ## Why this matters

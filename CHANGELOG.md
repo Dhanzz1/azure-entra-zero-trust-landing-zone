@@ -29,6 +29,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   manual tenant settings without public evidence. Added a control-by-control evidence index.
 
 ### Fixed
+- Group naming policy described as applying to Microsoft 365 groups only, per Microsoft's naming-policy documentation.
 - Rule-overlap wording: only the membership rule's lookback exceeds its frequency.
 - Conditional Access module README no longer claims the module guarantees an emergency-access path.
 - Assumptions no longer suggest AzAPI for Graph-hosted tenant settings, which contradicted ADR-006.
