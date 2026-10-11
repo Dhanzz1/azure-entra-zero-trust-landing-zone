@@ -11,7 +11,7 @@ Module: `terraform/modules/conditional-access-policy` (inputs: display name, sta
 - **Block legacy authentication** — removes the primary MFA-bypass vector.
 - **Require MFA for all users** — baseline strong authentication.
 - **Block high-risk sign-ins** — Entra ID Protection (P2) blocks sessions scored high risk.
-- **High user-risk remediation** — Entra ID Protection (P2) requires MFA plus secure password change for users scored high risk; deployed in report-only mode, which is its terminal state for this release.
+- **High user-risk remediation** — Entra ID Protection (P2) requires MFA plus secure password change for users scored high risk; deployed in report-only mode, which is its final state for this release.
 
 All policies exclude the emergency-exclusion groups — both the legacy group and the role-assignable group are in the active exclusion path. CA001-CA003 are enforced. CA004 is report-only evaluated: it is evaluated without enforcement, so it neither blocks nor remediates, and promotion to enforced is not planned for this release.
 

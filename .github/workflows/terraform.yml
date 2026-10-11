@@ -10,9 +10,16 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        root:
+          - terraform
+          - terraform/detections
+
     defaults:
       run:
-        working-directory: terraform
+        working-directory: ${{ matrix.root }}
 
     steps:
       - name: Checkout
@@ -20,6 +27,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.7
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive

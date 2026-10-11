@@ -3,10 +3,43 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-> **Status: v1.0 is the terminal release of this repository.** Scope is an identity and detection
-> baseline; device management is out of scope by decision, not deferral. Control statuses use the
-> fixed meanings defined in the [README](README.md#control-status) — "Complete" is deliberately not
-> a status.
+> **Status: archived lab.** Scope is an identity and detection baseline, evidenced between July and
+> August 2026 in a trial tenant. The owner reports expired trial licences; no expiry date is asserted,
+> and current operation is unverified. Device management is out of scope
+> (ADR-006). Control statuses use the fixed meanings defined in the [README](README.md#control-status).
+
+## [1.0.1] - 2026-10-11 - Close-out
+
+### Changed
+- README opening rewritten to lead with what was built and the evidence, and to mark the repository
+  as an archived lab with historical, dated evidence.
+- CA001 and CA003 relabelled **Enabled; What If tested**, a new status in the README vocabulary.
+  Their published evidence is What If evaluation, not a live triggering event.
+- Published the 16 Aug 2026 19:42 add-member alert, distinct from the 15 Aug canary test. Its truncated
+  `Group.ObjectID` newValue begins `7c`, consistent with the role-assignable exclusion group, not exact
+  target verification. Published group properties, memberships and exclusion evaluation from Session 2.
+- Threat 8 (external oversharing) restated as not mitigated by this repository, matching ADR-004.
+- Sanitisation statement corrected: `dhanzlabs.com` lab UPNs, user/group object IDs and the NordPass name
+  remain visible. Tenant IDs, subscription IDs, source IPs and credential identifiers are not visible in
+  the published images. Existing redactions are preserved.
+- Published PIM v1-02 to v1-07 under their existing names: Conditional Access Administrator for a test
+  admin is **Portal-managed and evidenced**. MFA is configured; later active-list absence is not an
+  access-denial test. Removed stale pending-evidence claims from governance, architecture and threats.
+- Identity-baseline status now separates code-defined accounts/groups, evidenced emergency access and
+  manual tenant settings without public evidence. Added a control-by-control evidence index.
+
+### Fixed
+- Rule-overlap wording: only the membership rule's lookback exceeds its frequency.
+- Conditional Access module README no longer claims the module guarantees an emergency-access path.
+- Assumptions no longer suggest AzAPI for Graph-hosted tenant settings, which contradicted ADR-006.
+- CI runs backend-disabled `init` and `validate` independently for both roots; Terraform is pinned to
+  1.15.7, matching local validation. Public CI does not run plan/apply.
+- AuditLogs owns the observed 7-minute maximum; SigninLogs has a 2-minute maximum.
+- Passkeys and PIM are portal-managed; only two rules monitor emergency access. The spray rule is tenant-wide.
+
+### Documented
+- Password-spray rule limitation: it counts every non-zero `ResultType`, including MFA interrupts and
+  the 50140 “Keep me signed in” interrupt, per [Microsoft's error-code reference](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes). No positive-event test is claimed.
 
 ## [1.0.0] - 2026-08-24 — Identity and detection baseline, terminal release
 
@@ -60,5 +93,6 @@ First public release. The identity baseline and the Conditional Access framework
 ### Security
 - No secrets, tenant identifiers, or Terraform state in the repository. State, `*.tfvars`, plan files, and provider schema are gitignored. Screenshots are sanitised (tenant and subscription IDs cropped); everything was built in a disposable developer tenant.
 
+[1.0.1]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/releases/tag/v1.0.0
 [0.1.0]: https://github.com/Dhanzz1/azure-entra-zero-trust-landing-zone/releases/tag/v0.1.0
