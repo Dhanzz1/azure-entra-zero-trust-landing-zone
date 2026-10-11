@@ -2,11 +2,11 @@
 
 [![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A5%201.7-7B42BC?logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform) ![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-0078D4?logo=microsoftazure&logoColor=white) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) ![Release: v1.0.1](https://img.shields.io/badge/Release-v1.0.1-blue) ![Scope: identity and detection](https://img.shields.io/badge/Scope-identity%20%2B%20detection-informational)
 
-A **Terraform-driven** Zero Trust identity baseline for Microsoft Entra ID, built and tested in a lab tenant. Four Conditional Access policies are rendered from one reusable module. Two emergency accounts use passkeys and sit behind two exclusion groups. Three Sentinel analytics rules watch that emergency path. All of it is defined as code.
+A **Terraform-driven** Zero Trust identity baseline for Microsoft Entra ID, built and tested in a lab tenant. Four Conditional Access policies are rendered from one reusable module. Two emergency accounts use portal-managed passkeys and belong to two code-defined exclusion groups. Two Sentinel rules monitor the emergency path; the third is a tenant-wide password-spray indicator. The accounts, groups, policies and detections are defined as code; passkeys and PIM are portal-managed. See the [control evidence index](docs/screenshots.md#control-evidence-index).
 
 Start with the evidence: [What If results, test sign-ins, Sentinel alerts and ingestion measurements](docs/screenshots.md), and the [decision records](docs/adr/) behind each trade-off.
 
-> **Status: archived lab.** Built and evidenced between July and August 2026 in a trial tenant. The licences have since expired, so every result here is historical and dated. It describes what was tested, not a running environment. Device management (Intune, Autopilot, update rings, Defender for Endpoint) is out of scope for this repository; see [Scope boundary](#scope-boundary). Privileged Identity Management was configured in the portal and is not code-defined; see [Known limitations](#known-limitations).
+> **Status: archived lab.** The configuration and tests document the historical licensed lab window. The owner reports that the trial licences have expired; no expiry date is asserted. Current tenant operation and premium-control operation are unverified, and licence expiry does not establish decommissioning. Device management (Intune, Autopilot, update rings, Defender for Endpoint) is out of scope; see [Scope boundary](#scope-boundary). PIM is **Portal-managed and evidenced** for a test administrator, with the limits documented [below](#known-limitations).
 
 ## Why this exists
 
@@ -31,14 +31,14 @@ Device-management controls are not shown; they are out of scope for this release
 
 ### Control status
 
-Statuses below are used with fixed meanings: **Planned** (design only), **Code-defined** (configuration exists, no verified deployment), **Deployed** (object exists in the lab), **Report-only evaluated** (evaluated without enforcement), **Enabled and tested** (enforced, with a safe test and evidence record), **Enabled; What If tested** (enforced, and tested with Conditional Access What If rather than a live triggering event), **Portal-managed and evidenced** (implemented manually, with configuration and operational proof). "Complete" is deliberately not a status.
+Statuses below describe the historical lab evidence, not verified current operation. They are used with fixed meanings: **Planned** (design only), **Code-defined** (configuration exists, no verified deployment), **Deployed** (object exists in the lab), **Report-only evaluated** (evaluated without enforcement), **Enabled and tested** (enforced, with a safe test and evidence record), **Enabled; What If tested** (enforced, and tested with Conditional Access What If rather than a live triggering event), **Portal-managed and evidenced** (implemented manually, with configuration and operational proof). "Complete" is deliberately not a status.
 
 | # | Module | Purpose | Zero Trust pillar | Status |
 |---|--------|---------|-------------------|--------|
-| 01 | identity-baseline | Tenant hardening, dynamic groups, emergency access | Identity | Enabled and tested |
+| 01 | identity-baseline | Accounts, groups and manual tenant settings | Identity | Accounts/groups: code-defined; emergency access: Enabled and tested; manual tenant settings: no public evidence |
 | 02 | conditional-access | CA policy framework as reusable Terraform | Identity | Enabled and tested (CA001, CA003: What If tested; CA004: Report-only evaluated) |
 | 07 | sentinel-kql | Sentinel workspace, Entra log export, KQL detections as code | Detection | Deployed; see [detection detail](#sentinel-detections-module-07) |
-| 09 | administrative-governance | Emergency access | Identity / Governance | Enabled and tested |
+| 09 | administrative-governance | Emergency access and test-admin PIM | Identity / Governance | Emergency access: Enabled and tested; PIM: Portal-managed and evidenced |
 | 08 | cloud-lifecycle-automation | Cloud-only joiner/mover/leaver automation | Automation | Planned — not implemented; see [Linked work](#linked-work) |
 
 ### Scope boundary
@@ -63,7 +63,7 @@ Three Terraform providers were evaluated as alternatives (`microsoft/msgraph` pu
 | CA003 | Block high-risk sign-ins (Entra ID Protection / P2) | Enabled; What If tested |
 | CA004 | Remediate high user risk with MFA + secure password change | Report-only evaluated |
 
-All four policies are rendered from a single reusable Terraform module and exclude the dedicated emergency-access groups. Both the legacy group and the role-assignable group are currently in the active exclusion path for every one of the four policies.
+All four policies are rendered from a single reusable Terraform module and exclude the dedicated emergency-access groups. The code includes both the legacy and role-assignable groups in every policy's exclusion path; the [Session 2 images](docs/screenshots.md#session-2-emergency-exclusion-evidence) show the group properties, memberships and an emergency-account exclusion evaluation. Current operation is unverified.
 
 **CA004 is deployed in report-only mode** and evaluated with Conditional Access What If for a high-user-risk scenario: it *would* require MFA and a secure password change. No genuine high-risk sign-in occurred in this lab tenant, so no report-only enforcement telemetry exists, and none was manufactured. Report-only means evaluated, not enforced — it neither blocks nor remediates. Promotion to enforced is **not** planned for this release.
 
@@ -74,16 +74,16 @@ A Log Analytics workspace with Microsoft Sentinel, a tenant-scoped Entra diagnos
 | Detection | Status |
 |---|---|
 | Emergency account sign-in | Enabled and tested — fired on a real emergency-account sign-in |
-| Protected exclusion group membership changed | Enabled and tested; fired on a real membership change to a canary group, then retargeted to both exclusion groups |
+| Protected exclusion group membership changed | Enabled and tested — canary test on 15 Aug 2026; later 16 Aug alert on an add-member event is consistent with the role-assignable exclusion group (target ID truncated) |
 | Password-spray indicator | Deployed and query-validated; no positive event generated, and none simulated |
 
-These are **lab baselines, not production detections**: no entity mapping, no allowlists, no assigned owner, no response procedure. The membership rule runs every 5 minutes over a 15-minute lookback, so it can raise duplicate alerts; this is an accepted trade-off. The other two rules use a lookback equal to their frequency. The spray rule counts every non-zero `ResultType`, so MFA interrupts can push it over threshold; it was never tested against a positive event. Ingestion lag was measured rather than assumed (sign-in logs averaged ~1.5 minutes, audit logs ~3.4 minutes with an observed maximum of 7, following a ~15-hour delay on first enablement).
+These are **lab baselines, not production detections**: no entity mapping, no allowlists, no assigned owner, no response procedure. In [the rule code](terraform/detections/rules.tf), membership monitoring runs every 5 minutes over a 15-minute lookback, so it can raise duplicate alerts; this is an accepted trade-off. The emergency-account rule uses 5/5 minutes and the spray rule 10/10, with no extra ingestion-delay allowance. The spray rule counts every non-zero `ResultType`, including MFA interrupts such as 50074 and the 50140 “Keep me signed in” interrupt ([Microsoft error-code reference](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes)); it has no positive-event test. [Measured ingestion](docs/screenshots.md#sentinel-detections-e13): SigninLogs averaged 1.5 minutes (max 2); AuditLogs averaged 3.4 minutes (max 7).
 
 ### Emergency access
 
 Two standing Global Administrator accounts, excluded from all four Conditional Access policies, with passkey authentication and Sentinel alerting on their interactive sign-ins.
 
-A **role-assignable parallel exclusion group** is code-defined and applied, with dual exclusions and Sentinel membership monitoring. Its properties and the retargeted rule are shown in the [evidence](docs/screenshots.md) (screenshots v1-17 and v1-19); the membership alert itself was validated on a canary group. The `isAssignableToRole` property cannot be added to an existing group, so migration was staged additively across four reviewed plans rather than replacing the original group — a replacement would have changed the object ID that every Conditional Access policy references. The legacy exclusion remains active; its retirement is deliberately deferred pending an observation period.
+A **role-assignable parallel exclusion group** is code-defined, with historical deployment evidence for dual exclusions and Sentinel membership monitoring. The [Session 2 captures](docs/screenshots.md#session-2-emergency-exclusion-evidence) show its properties, both groups' memberships and an emergency-account exclusion evaluation. The 16 Aug 2026 19:42 “Add member to group” alert has a `Group.ObjectID` newValue beginning `7c`, consistent with `CA-BreakGlass-Exclude-RoleAssignable` (`7c149300-…`); the truncated ID does not verify the exact target. This is separate from the 15 Aug canary test. The group was added alongside the legacy group rather than replacing it; [the code](terraform/break-glass.tf) retains both groups. Legacy retirement remains out of scope for this close-out.
 
 The exclusions apply to **this repository's** Conditional Access policies. They do not bypass Microsoft's mandatory portal MFA, and the emergency accounts still authenticate with their passkeys.
 
@@ -171,8 +171,8 @@ not excluded.
 
 ### Stage 4 — disable Security Defaults
 
-Entra admin center → **Properties** → **Manage security defaults** → Disabled. There is no clean
-provider resource for this toggle.
+Entra admin center → **Properties** → **Manage security defaults** → Disabled. This lab configured the toggle manually under its pinned
+`hashicorp/azuread ~> 2.50` provider.
 
 The tenant is least protected between this stage and the next. Do not leave it here.
 
@@ -208,7 +208,7 @@ The emergency-access design and its trade-offs are in [ADR-002](docs/adr/adr-002
 ## Known limitations
 
 - **Terraform state is local**, one state file per root, with no remote backend or locking. A lab limitation, not a recommended pattern.
-- **PIM is portal-managed.** Directory-role activation settings and the eligible assignment were configured and exercised during the licensed lab window: activation, justification, expiry and post-expiry behaviour were all observed. Public evidence is pending. They are not code-defined. PIM eligible assignments are also removed when the P2 licence lapses, so that evidence represents the licensed window rather than a persistent state.
+- **PIM is Portal-managed and evidenced**, not code-defined. [v1-02 through v1-07](docs/screenshots.md#privileged-identity-management) show Conditional Access Administrator for `admin_test@dhanzlabs.com`: activation settings, eligibility, justification, an active assignment with expiry, a successful activation audit and later absence from the filtered active list. MFA on activation is configured; a challenge is not captured. The later list does not prove post-expiry access denial. These are historical observations, not evidence of current premium-control operation.
 - **Provider versions:** `hashicorp/azuread ~> 2.50` (v2.53.1 in use). The v3 line has not been adopted.
 - **CA005 and CA006 are not implemented** — not planned for this release.
 - Fuller detail, including the reference tenant profile every trade-off is sized against, is in [assumptions & limitations](docs/assumptions-limitations.md).
@@ -223,7 +223,7 @@ The emergency-access design and its trade-offs are in [ADR-002](docs/adr/adr-002
 
 ## Security & sanitisation
 
-This repository contains **no secrets or Terraform state**. State, `*.tfvars`, plan files and provider schema are gitignored. Tenant and subscription IDs and source IP addresses are redacted from screenshots. Lab identifiers (the `onmicrosoft.com` domain, emergency-account UPNs and object IDs) are left visible so the evidence can be cross-checked. Everything was built in a disposable trial tenant.
+This repository contains **no secrets or Terraform state**. State, `*.tfvars`, plan files and provider schema are gitignored. Published images have no visible tenant ID, subscription ID, source IP or credential identifier. Lab `dhanzlabs.com` UPNs, user/group object IDs and the NordPass name are deliberately visible; these are distinguished from credentials and redacted credential identifiers.
 
 ## License
 

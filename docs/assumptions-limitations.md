@@ -2,8 +2,8 @@
 
 ## Assumptions
 
-- A single disposable **developer/lab Entra tenant** is used; Entra objects are free and persistent, so the lab is left standing between working sessions.
-- **Trial licensing**: Entra ID P2 for risk-based Conditional Access and PIM. No device-management licensing is used — Intune and Defender for Endpoint are out of scope for this release. Features requiring premium licences are noted per module.
+- A single disposable **developer/lab Entra tenant** was used. Configuration and tests describe the historical licensed lab window; the repository does not establish whether the tenant is operating or decommissioned now.
+- **Trial licensing**: Entra ID P2 was used for risk-based Conditional Access and PIM. The owner reports that the trial licences have expired, without an asserted expiry date. Current premium-control operation is unverified. Intune and Defender for Endpoint are out of scope.
 - **Local Terraform state** for the demo. A production setup would use a remote backend (Azure Storage) with state locking — intentionally out of scope here.
 - Authentication to Azure is via interactive `az login`; a least-privilege service principal would replace this for CI/CD.
 
@@ -11,8 +11,8 @@
 
 - This is a **reference implementation**, not a production-hardened, multi-tenant framework.
 - Cloud-only: no hybrid AD, on-premises infrastructure, or network security (NSG/firewall).
-- The README control-status table is the source of truth for what is implemented versus designed. The repository is an archived lab: evidence was captured between July and August 2026 and the trial licences have since expired. Modules marked out of scope are recorded decisions (ADR-006).
-- Some tenant settings are configured manually because the `azuread` provider lacks first-class resources (see below).
+- The README control-status table describes the historical evidence. Licence expiry is owner-reported and does not prove decommissioning. Out-of-scope modules are recorded decisions (ADR-006).
+- Some tenant settings are configured manually under the lab's pinned `hashicorp/azuread ~> 2.50` provider (see below).
 
 ## Human Validation Boundaries
 
@@ -26,16 +26,16 @@ The identity baseline is intentionally split between Terraform-managed resources
 
 Codified in Terraform:
 
-- `terraform/break-glass.tf` creates two cloud-only break-glass accounts and the `CA-BreakGlass-Exclude` security group.
+- `terraform/break-glass.tf` creates two cloud-only break-glass accounts and both emergency exclusion groups; see [the code](../terraform/break-glass.tf).
 - `terraform/identity-baseline.tf` creates the `All-Members-Dynamic` dynamic group.
 
-Configured manually because the `azuread` provider does not currently provide clean first-class resources for these tenant settings:
+The following settings were portal-managed in this lab under its pinned `hashicorp/azuread ~> 2.50` provider. This is not a claim about all current providers. SSPR, password protection, naming policy and group licensing have no public evidence:
 
 - Self-service password reset (SSPR): Entra admin center -> Protection -> Password reset.
 - Password protection, including custom banned-password list and smart lockout: Entra admin center -> Protection -> Authentication methods -> Password protection.
 - Group naming policy: Entra admin center -> Groups -> Naming policy.
 - Group-based licensing for assigning the EMS E5 / Entra ID P2 licence to `All-Members-Dynamic`: Entra admin center -> Groups -> All-Members-Dynamic -> Licenses.
-- Security Defaults: disabled manually (Entra -> Properties -> Manage security defaults) to allow custom Conditional Access; there is no clean provider resource for this toggle.
+- Security Defaults: disabled manually (Entra -> Properties -> Manage security defaults) to allow custom Conditional Access; portal-managed under the pinned provider.
 - Location-based admin restrictions are out of scope for v1.0; no admin-location Conditional Access policy consumes them.
 - Guest authorization is handled through collaboration membership and SharePoint sharing settings rather than a guest-specific Conditional Access policy; broader guest governance is out of scope for v1.0.
 

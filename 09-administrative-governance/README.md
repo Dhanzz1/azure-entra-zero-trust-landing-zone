@@ -2,23 +2,23 @@
 
 **Status:** Emergency access — Enabled and tested. Zero Trust pillar: Identity / Governance
 
-**Privileged Identity Management:** portal-managed and not code-defined, so it carries no status from the vocabulary above. Public evidence is pending — see [below](#privileged-identity-management).
+**Privileged Identity Management:** **Portal-managed and evidenced**, not code-defined. Evidence is historical and scoped to Conditional Access Administrator for a test admin — see [below](#privileged-identity-management).
 
 ## Purpose
 
-Apply least-privilege to administration: standing privilege only for passkey-protected emergency accounts, and just-in-time elevation for everyone else.
+Apply least-privilege to administration: standing Global Administrator for passkey-protected emergency accounts, and a demonstrated just-in-time Conditional Access Administrator assignment for a test admin.
 
 ## Implemented
 
-- Two cloud-only **break-glass** accounts with **permanent Global Administrator** (deliberately not PIM-eligible), excluded from repository-managed Conditional Access via the `CA-BreakGlass-Exclude` group. Both use portal-managed, separately tested synced passkeys to satisfy Microsoft's mandatory portal MFA. The account/group baseline is implemented in `terraform/break-glass.tf`; the passkeys are portal-managed. See [ADR-002](../docs/adr/adr-002-break-glass-exclusion.md).
-- A **role-assignable parallel exclusion group** (`CA-BreakGlass-Exclude-RoleAssignable`) is code-defined and applied, with dual exclusions and Sentinel membership monitoring. Public validation evidence is pending. The legacy exclusion remains active; retirement is deliberately deferred pending an observation period.
-- **Sentinel monitoring is deployed and tested** (module 07): an alert on emergency-account **interactive** sign-in, and an alert on membership changes to the protected exclusion groups. Both have fired on real events. This is the compensating control for the standing Global Administrator accounts — and its boundary is part of the control: a non-interactive emergency-account sign-in would not alert, because the rule query reads `SigninLogs` only. See [module 07 limitations](../07-sentinel-kql/README.md#limitations).
+- Two cloud-only **break-glass** accounts with **permanent Global Administrator** (deliberately not PIM-eligible), excluded from repository-managed Conditional Access via both `CA-BreakGlass-Exclude` and `CA-BreakGlass-Exclude-RoleAssignable` in [the code](../terraform/conditional-access.tf). Both use portal-managed, separately tested synced passkeys to satisfy Microsoft's mandatory portal MFA. The account/group baseline is implemented in `terraform/break-glass.tf`; the passkeys are portal-managed. See [ADR-002](../docs/adr/adr-002-break-glass-exclusion.md).
+- A **role-assignable parallel exclusion group** (`CA-BreakGlass-Exclude-RoleAssignable`) is code-defined with historical deployment evidence. [Session 2 captures](../docs/screenshots.md#session-2-emergency-exclusion-evidence) show properties, memberships and exclusion evaluation. The code retains both exclusions; legacy retirement is outside this close-out.
+- **Sentinel monitoring was deployed and tested** (module 07): [v1-11](../docs/screenshots/v1-11-emergency-account-alert.png) shows the interactive sign-in alert; the 15 Aug canary membership test is separate from the 16 Aug 19:42 add-member alert [consistent with the role-assignable group](../docs/screenshots.md#session-2-emergency-exclusion-evidence), whose target ID is truncated. These are historical tests, not verified current monitoring. The emergency rule reads `SigninLogs` only, so non-interactive sign-ins would not alert. See [module 07 limitations](../07-sentinel-kql/README.md#limitations).
 
 ## Privileged Identity Management
 
-PIM was configured and exercised during the licensed lab window: activation, justification, expiry and post-expiry behaviour were all observed. Public evidence is pending. It is **not** code-defined.
+PIM is **Portal-managed and evidenced** for **Conditional Access Administrator**, assigned to the test admin `admin_test@dhanzlabs.com`. [v1-02 through v1-07](../docs/screenshots.md#privileged-identity-management) show activation settings, eligibility, a one-hour activation request with justification, an active assignment with an expiry, a successful activation audit and later absence from the filtered active list. MFA on activation is configured; no capture shows it challenging. The later absence does not prove post-expiry access denial or another role's lifecycle. The historical justification mentions CA004 promotion; promotion remains out of scope.
 
-- PIM eligible assignments are removed when the Entra ID P2 licence lapses, so that observation represents the licensed window rather than a persistent state.
+- This records the licensed lab window. The owner reports expired trial licences; no expiry date or verified current PIM operation is asserted.
 - Administrative units for delegated management: **Planned** — not implemented.
 
 ## Why this matters

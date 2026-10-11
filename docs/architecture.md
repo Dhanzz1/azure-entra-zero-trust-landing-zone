@@ -9,13 +9,13 @@ All ADR trade-offs are written against this context; larger enterprises may choo
 ## Design principles
 This landing zone applies the three Zero Trust tenets. Device trust is a tenet of the model, not a control this release implements:
 - **Verify explicitly** — every access decision uses identity and risk signals (Conditional Access + Identity Protection). Device state is a designed input to the same decision point, but no device signal is collected here and no policy consumes one.
-- **Least privilege** — standing privilege is limited to two passkey-protected emergency accounts, and a Sentinel analytics rule alerts on their interactive sign-ins. Day-to-day admin is designed around PIM: the eligible assignment and role-activation settings (just-in-time, MFA, justification) were configured and exercised in the portal during the licensed lab window rather than defined in code.
+- **Least privilege** — standing privilege is limited to two passkey-protected emergency accounts, and a Sentinel analytics rule alerts on their interactive sign-ins. Day-to-day admin is designed around PIM: the Conditional Access Administrator eligible assignment for a test admin, and its activation settings, were portal-managed during the licensed lab window. [The images](screenshots.md#privileged-identity-management) evidence activation and justification; MFA is configured rather than shown challenging.
 - **Assume breach** — legacy authentication blocked, high sign-in risk blocked, three Sentinel analytics rules deployed as code, and the emergency-access exclusion groups themselves monitored for membership change.
 
 ## Identity-First Control Map
 | Zero Trust pillar | NIST 800-207 alignment | Controls | Modules | In this release |
 |-------------------|------------------------|----------|---------|-----------------|
-| Identity | Policy Engine / Policy Decision Point | Conditional Access, MFA, risk-based access, emergency access, PIM | 01, 02, 09 | Yes — PIM is portal-managed, not code-defined |
+| Identity | Policy Engine / Policy Decision Point | Conditional Access, MFA, risk-based access, emergency access, PIM | 01, 02, 09 | Historical evidence — PIM is Portal-managed and evidenced for a test admin, not code-defined |
 | Devices | Device trust as a policy input | Intune compliance, Autopilot, update rings | 03, 04, 05 | No — out of scope |
 | Threat protection | Continuous diagnostics | Defender for Endpoint, ASR | 06 | No — out of scope |
 | Detection & response | Monitoring / analytics | Sentinel, KQL analytics | 07 | Yes |
@@ -43,7 +43,7 @@ Sequencing and dependencies as built:
 Modules **03 device-compliance** and **06 defender-endpoint** would have fed a "require compliant device" signal back into 02. That path is out of scope for this release; the reasoning is in the [scope boundary](../README.md#scope-boundary).
 
 ## Administrative & break-glass model
-Two cloud-only break-glass accounts hold **permanent** Global Administrator (deliberately *not* PIM-eligible, so role activation can never be blocked in an emergency). They are excluded from this repository's Conditional Access policies, but still satisfy Microsoft's mandatory portal MFA with separately tested synced passkeys. A Sentinel scheduled analytics rule alerts on interactive sign-ins by either account (module 07); non-interactive sign-ins are collected but no rule evaluates them. Day-to-day admin is designed to move to **PIM** — eligible assignment, just-in-time activation, MFA and justification — which was configured and exercised in the portal rather than defined in code, with public evidence pending.
+Two cloud-only break-glass accounts hold **permanent** Global Administrator (deliberately *not* PIM-eligible, so role activation can never be blocked in an emergency). They are excluded from this repository's Conditional Access policies, but still satisfy Microsoft's mandatory portal MFA with separately tested synced passkeys. A Sentinel scheduled analytics rule alerts on interactive sign-ins by either account (module 07); non-interactive sign-ins are collected but no rule evaluates them. Day-to-day admin is designed to move to **PIM** — eligible assignment, just-in-time activation, MFA and justification — which was configured and exercised in the portal rather than defined in code, with [published historical PIM evidence](screenshots.md#privileged-identity-management) for Conditional Access Administrator on a test admin. MFA on activation is configured, not captured challenging; the later active-list absence is not proof of post-expiry access denial.
 
 ## Hybrid Identity Notes
 This lab is cloud-only, but a production landing zone must choose an authentication method:
